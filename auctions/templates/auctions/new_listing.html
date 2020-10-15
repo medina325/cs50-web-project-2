@@ -1,0 +1,48 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="form-group row">
+            <label for="title" class="col-sm-1 col-form-label">Title:</label>
+            <div class="col-sm-7">
+                <input type="text" class="form-control" name="title" id="title" required>
+                <small class="form-text text-muted" id="titleTip">Be sure to put a nice tittle to get everyone's attention :D</small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="description" class="col-sm-1 col-form-label">Description:</label>
+            <div class="col-sm-5">
+                <textarea class="form-control" id="description" name="desc" rows="5" required>colocar conteudo do db aqui para futura edicao</textarea>
+                <small class="form-text text-muted" id="descTip">Describe your listing the best way possible ;)</small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="bid" class="col-sm-1 col-form-label">Starting bid:</label>
+            <div class="col-sm-2">
+                <input type="number" class="form-control" name="initial_bid" id="bid" min="0" step="0.01" placeholder="Place the initial bid" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="url" class="col-sm-1 col-form-label">*Image URL:</label>
+            <div class="col-sm-5">
+                <input type="url" class="form-control" name="image_url" id="url" placeholder="Image URL here">
+            </div>
+        </div>
+        <fieldset class="form-group">
+            <div class="row">
+                <legend class="col-form-label col-sm-1 pt-0">*Category:</legend>
+                <div class="col-sm-10">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="category_chosen" id="category" value="option??">
+                        <label class="form-check-label" for="category">Database category</label>
+                        <small class="form-text text-muted">All * are optional fields</small>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        
+
+        <button type="submit" class="btn btn-outline-success">Create listing</button>
+      </form>
+{% endblock %}

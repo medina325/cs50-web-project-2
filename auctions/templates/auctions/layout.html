@@ -4,8 +4,32 @@
 <html lang="en">
     <head>
         <title>{% block title %}Auctions{% endblock %}</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" type="text/css" href="{% static 'auctions/bootstrap.min.css' %}">
+        <link rel="stylesheet" type="text/class" href="{% static 'auctions/styles.css' %}" >
+
+        <style>            
+            body {
+                padding: 10px;
+                background-color: rgb(63, 58, 65); 
+                color: white;
+            }
+
+            a:hover {
+                color: rgb(0, 255, 55);
+            }
+
+            .nav-link {
+            display: block;
+            padding: .5rem 1rem;
+            color: rgb(13, 209, 56);
+            font-weight: bold;
+            }
+
+        </style>
     </head>
     <body>
         <h1>Auctions</h1>
@@ -18,11 +42,14 @@
         </div>
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                <button type="button" class="btn btn-link"><a class="nav-link" href="{% url 'index' %}">Active Listings</a></button>                
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    <button type="button" class="btn btn-link"><a class="nav-link" href="{% url 'createlisting' %}">Create New Listing</a></button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="btn btn-link"><a class="nav-link" href="{% url 'logout' %}">Log Out</a></button>
                 </li>
             {% else %}
                 <li class="nav-item">

@@ -1,11 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
+# Include more things 
 class User(AbstractUser):
-    userCode = models.AutoField(primary_key=True, serialize=False, verbose_name="userID")
-    # Include more things
-
+    pass
 class Listing(models.Model):
     title = models.CharField(max_length=30)
     description = models.TextField()
