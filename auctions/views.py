@@ -4,8 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
-
+from .models import User, Listing, Bid, Comment 
+from django.db import models
 
 def index(request):
     return render(request, "auctions/index.html")
@@ -63,5 +63,28 @@ def register(request):
         return render(request, "auctions/register.html")
 
 # -----------------------------------------------------------------------------------------------------------------
-def create_listing_view(request):
+@login_required
+def create_listing(request):
+    if request.method == "POST":
+        user = User.objects.get(username=request.user.username)
+        l = Listing(created_by=user, 
+                    title=request.POST["title"], 
+                    description=request.POST["desc"], 
+                    # https://stackoverflow.com/questions/12176585/handling-dates-over-request-get
+                    creation_date=models.DateTimeField(auto_now_add=True), 
+                    img_url=request.POST["image_url"]
+                    )
+        l.save()
+
+        b = Bid(l, 
+                user, 
+                request.POST["initial_bid"], 
+                models.DateTimeField(auto_now_add=True)
+                )
+        b.save()
+
+    return render(request, "auctions/index.html")
+
+@login_required
+def new_listing_view(request):
     return render(request, "auctions/new_listing.html")

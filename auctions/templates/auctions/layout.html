@@ -46,7 +46,7 @@
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <button type="button" class="btn btn-link"><a class="nav-link" href="{% url 'createlisting' %}">Create New Listing</a></button>
+                    <button type="button" class="btn btn-link"><a class="nav-link" href="{% url 'newlisting' %}">Create New Listing</a></button>
                 </li>
                 <li class="nav-item">
                     <button type="button" class="btn btn-link"><a class="nav-link" href="{% url 'logout' %}">Log Out</a></button>

@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <form action="" method="post">
+    <form action="{% url 'createlisting' %}" method="post">
         {% csrf_token %}
         <div class="form-group row">
             <label for="title" class="col-sm-1 col-form-label">Title:</label>
