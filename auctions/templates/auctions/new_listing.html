@@ -34,8 +34,10 @@
                 <legend class="col-form-label col-sm-1 pt-0">*Category:</legend>
                 <div class="col-sm-10">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="category_chosen" id="category" value="option??">
-                        <label class="form-check-label" for="category">Database category</label>
+                        {% for category in category_list %}
+                            <input class="form-check-input" type="radio" name="category_chosen" id="category" value=f"option{id}">
+                            <label class="form-check-label" for="category">{{ category.name }}</label><br>
+                        {% endfor %}
                         <small class="form-text text-muted">All * are optional fields</small>
                     </div>
                 </div>

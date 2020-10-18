@@ -5,11 +5,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Listing, Bid, Comment 
-# from django.db import models
+from .models import *
+from django.db import models
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html", {
+        "listing_list": Listing.objects.all()
+    })
 
 
 def login_view(request):
@@ -71,21 +73,27 @@ def create_listing(request):
         l = Listing(created_by=user, 
                     title=request.POST["title"], 
                     description=request.POST["desc"], 
-                    # https://stackoverflow.com/questions/12176585/handling-dates-over-request-get
-                    creation_date=models.DateTimeField(auto_now_add=True), 
+                    # https://stackoverflow.com/questions/12176585/handling-dates-over-request-get 
                     img_url=request.POST["image_url"]
                     )
         l.save()
 
-        b = Bid(l, 
-                user, 
-                request.POST["initial_bid"], 
-                models.DateTimeField(auto_now_add=True)
+        b = Bid(listing=l,
+                user=user, 
+                price=request.POST["initial_bid"]
                 )
         b.save()
 
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html", {
+        "listing_list": Listing.objects.all()
+    })
 
 @login_required
 def new_listing_view(request):
-    return render(request, "auctions/new_listing.html")
+    return render(request, "auctions/new_listing.html", {
+        "category_list": Category.objects.all()
+    })
+
+@login_required
+def place_bid_view(request):
+    return render(request, "auctions/place_bid.html")

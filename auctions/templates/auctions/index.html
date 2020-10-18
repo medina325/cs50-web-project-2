@@ -3,5 +3,16 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
+
+    {% for listing in listing_list %}
+        <div>
+            <h2><a href="{% url 'placebid' %}">{{ listing.title }}</a></h2>
+            {% if listing.img_url != null %}
+                <img class="img_listing" src={{ listing.img_url }} height="220" width="220" alt="Ps4 Pro">
+            {% endif %}
+            <p>Category: {{ listing.category }}</p>
+            <p>Description: {{ listing.description }}</p>
+            <p>Created on {{ listing.creation_date}}</p>
+        </div>
+    {% endfor %}
 {% endblock %}
