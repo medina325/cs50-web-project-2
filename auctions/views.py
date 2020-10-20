@@ -74,7 +74,8 @@ def create_listing(request):
                     title=request.POST["title"], 
                     description=request.POST["desc"], 
                     # https://stackoverflow.com/questions/12176585/handling-dates-over-request-get 
-                    img_url=request.POST["image_url"]
+                    img_url=request.POST["image_url"],
+                    current_bid=request.POST["initial_bid"]
                     )
         l.save()
 
@@ -92,6 +93,25 @@ def create_listing(request):
 def new_listing_view(request):
     return render(request, "auctions/new_listing.html", {
         "category_list": Category.objects.all()
+    })
+
+@login_required
+def place_bid(request):
+    if request.method == "POST":
+        user = request.user
+        new_bid = request.POST["new_bid"]
+        l = Listing.objects.get(pk=request.POST["id"])
+        l.current_bid = new_bid
+        l.save()
+        
+        b = Bid(listing=l,
+                user=user,
+                price=request.POST["new_bid"]
+                )
+        b.save()
+
+    return render(request, "auctions/index.html",{
+        "listing_list": Listing.objects.all()
     })
 
 @login_required
