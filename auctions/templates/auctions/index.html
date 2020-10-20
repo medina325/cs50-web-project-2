@@ -1,24 +1,38 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
-    <ul class="nav flex-column">
-        {% for l in listing_list %}
-            <li class="nav-item">
-                <h2><a href="{% url 'placebid' l.listingID %}">{{ l.title }}</a></h2>
-                {% if l.img_url != null %}
-                    <img class="img_listing" src={{ l.img_url }} height="220" width="220" alt="{{ l.title }}">
-                {% endif %}
-                {% if l.current_bid is None %}
-                    <p>Current bid: $ 0.00 </p>
-                {% else %}
-                    <p>Current bid: $ {{ l.current_bid }}</p>
-                {% endif %}
-                <p>Description: {{ l.description }}</p>
-                <p>Category: {{ l.category }}</p>
-                <p>Created on {{ l.creation_date}}</p>
-                <hr style="border: .5px solid rgb(81, 112, 112);">
-            </li>
-        {% endfor %}
-      </ul>
+    <h2>Active Listings</h2>    
+    <hr>
+        <div class="row">
+            {% for l in listing_list %}
+                <div class="col-sm-2">
+                    <div class="card">
+                        <div class="card text-center">
+                            <div class="card-header">
+                                <strong><a href="{% url 'placebid' l.listingID %}">{{ l.title }}</a></strong>
+                            </div>
+                        </div>
+                        {% if l.img_url != null %}
+                            <div class="card-body">
+                                <img class="card-img-top" src={{ l.img_url }} alt="{{ l.title }}">
+                            </div>
+                        {% endif %}
+                        <div style="font-size: 14px;">
+                            <ul class="list-group list-group-flush" >
+                                <li class="list-group-item">{{ l.description }}</li>
+                                {% if l.current_bid is None %}
+                                    <li class="list-group-item">Current bid: $ 0.00</li>
+                                {% else %}
+                                    <li class="list-group-item">Current bid: $ {{ l.current_bid }}</li>
+                                {% endif %}
+                            </ul>
+                            <div class="card-footer text-muted text-center">
+                                Created on {{ l.creation_date}}
+                            </div>
+                        </div>
+                    </div>              
+                </div>
+            {% endfor %}  
+        </div>
+        
 {% endblock %}
