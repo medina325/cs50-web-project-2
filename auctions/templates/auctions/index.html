@@ -2,17 +2,23 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
-
-    {% for listing in listing_list %}
-        <div>
-            <h2><a href="{% url 'placebid' %}">{{ listing.title }}</a></h2>
-            {% if listing.img_url != null %}
-                <img class="img_listing" src={{ listing.img_url }} height="220" width="220" alt="Ps4 Pro">
-            {% endif %}
-            <p>Category: {{ listing.category }}</p>
-            <p>Description: {{ listing.description }}</p>
-            <p>Created on {{ listing.creation_date}}</p>
-        </div>
-    {% endfor %}
+    <ul class="nav flex-column">
+        {% for l in listing_list %}
+            <li class="nav-item">
+                <h2><a href="{% url 'placebid' l.listingID %}">{{ l.title }}</a></h2>
+                {% if l.img_url != null %}
+                    <img class="img_listing" src={{ l.img_url }} height="220" width="220" alt="{{ l.title }}">
+                {% endif %}
+                {% if l.current_bid is None %}
+                    <p>Current bid: $ 0.00 </p>
+                {% else %}
+                    <p>Current bid: $ {{ l.current_bid }}</p>
+                {% endif %}
+                <p>Description: {{ l.description }}</p>
+                <p>Category: {{ l.category }}</p>
+                <p>Created on {{ l.creation_date}}</p>
+                <hr style="border: .5px solid rgb(81, 112, 112);">
+            </li>
+        {% endfor %}
+      </ul>
 {% endblock %}

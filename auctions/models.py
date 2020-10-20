@@ -23,6 +23,7 @@ class Listing(models.Model):
     creation_date = models.DateField(auto_now=True)
     img_url = models.URLField(null=True, blank=True)
     active = models.BooleanField(default=True)
+    current_bid = models.FloatField(null=True, blank=True, default=None)
 
     def __str__(self):
         return f"{self.title}"

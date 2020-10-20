@@ -10,7 +10,7 @@ from django.db import models
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "listing_list": Listing.objects.all()
+        "listing_list": Listing.objects.all() 
     })
 
 
@@ -95,5 +95,7 @@ def new_listing_view(request):
     })
 
 @login_required
-def place_bid_view(request):
-    return render(request, "auctions/place_bid.html")
+def place_bid_view(request, listingID):
+    return render(request, "auctions/place_bid.html", {
+        "l": Listing.objects.get(pk=listingID)
+    })
