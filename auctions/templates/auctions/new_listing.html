@@ -35,7 +35,7 @@
                 <div class="col-sm-10">
                     <div class="form-check">
                         {% for category in category_list %}
-                            <input class="form-check-input" type="radio" name="category_chosen" id="category" value=f"option{id}">
+                            <input class="form-check-input" type="radio" name="category_chosen" id="category" value="Other">
                             <label class="form-check-label" for="category">{{ category.name }}</label><br>
                         {% endfor %}
                         <small class="form-text text-muted">All * are optional fields</small>

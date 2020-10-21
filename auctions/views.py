@@ -112,13 +112,19 @@ def place_bid(request):
                 )
         b.save()
 
-    return render(request, "auctions/place_bid.html",{
-        "listing_list": l
+    return render(request, "auctions/place_bid.html", {
+        "listing": Listing.objects.get(pk=l.listingID)
     })
 
 @login_required
 def place_bid_view(request, listingID):
+    if request.user.watchlist.get(listingID=listingID) is not None:
+        flag = True
+    else:
+        flag = False
+
     return render(request, "auctions/place_bid.html", {
+        "watch_flag": flag,
         "listing": Listing.objects.get(pk=listingID)
     })
     
@@ -129,6 +135,18 @@ def add_to_watchlist(request):
         l = Listing.objects.get(pk=request.POST["id"])
         l.watchers.add(user)
         return render(request, "auctions/place_bid.html", {
+            "flag": True,
+            "listing": l
+        })
+
+@login_required
+def remove_from_watchlist(request):
+    if request.method == "POST":
+        user = request.user
+        l = Listing.objects.get(pk=request.POST["id"])
+        l.watchers.remove(user)
+        return render(request, "auctions/place_bid.html", {
+            "flag": False,
             "listing": l
         })
 
