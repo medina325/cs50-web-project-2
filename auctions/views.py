@@ -117,6 +117,15 @@ def place_bid(request):
 @login_required
 def place_bid_view(request, listingID):
     return render(request, "auctions/place_bid.html", {
-        "l": Listing.objects.get(pk=listingID)
+        "listing": Listing.objects.get(pk=listingID)
     })
     
+@login_required
+def add_to_watchlist(request):
+    if request.method == "POST":
+        user = request.user
+        l = Listing.objects.get(pk=request.POST["id"])
+        l.watchers.add(user)
+        return render(request, "auctions/place_bid.html", {
+            "listing": l
+        })
