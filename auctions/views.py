@@ -71,6 +71,7 @@ def create_listing(request):
     if request.method == "POST":
         user = User.objects.get(username=request.user.username)
         l = Listing(created_by=user, 
+                    category=request.POST["category_chosen"],
                     title=request.POST["title"], 
                     description=request.POST["desc"], 
                     # https://stackoverflow.com/questions/12176585/handling-dates-over-request-get 
@@ -86,6 +87,7 @@ def create_listing(request):
         b.save()
 
     return render(request, "auctions/index.html", {
+        "Header": "Active Listings",
         "listing_list": Listing.objects.all()
     })
 
@@ -110,8 +112,8 @@ def place_bid(request):
                 )
         b.save()
 
-    return render(request, "auctions/index.html",{
-        "listing_list": Listing.objects.all()
+    return render(request, "auctions/place_bid.html",{
+        "listing_list": l
     })
 
 @login_required
@@ -129,3 +131,19 @@ def add_to_watchlist(request):
         return render(request, "auctions/place_bid.html", {
             "listing": l
         })
+
+@login_required
+def watchlist_view(request):
+    user = request.user
+    return render(request, "auctions/index.html", {
+        "Header": "Watchlist",
+        "listing_list": user.watchlist.all()
+    })
+
+@login_required
+def category_listings_view(request, category_name):
+    c = Category.objects.get(name=category_name)
+    return render(request, "auctions/index.html", {
+        "Header": c.name + "'s Listings",
+        "listing_list": c.listings_on_this_category.all()
+    })
