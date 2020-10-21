@@ -119,3 +119,4 @@ def place_bid_view(request, listingID):
     return render(request, "auctions/place_bid.html", {
         "l": Listing.objects.get(pk=listingID)
     })
+    

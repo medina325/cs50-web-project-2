@@ -1,9 +1,26 @@
+body {
+    padding: 10px;
+    background-color: rgb(65, 58, 63); 
+    color: white;
+}
+
+a:hover {
+    color: rgb(0, 255, 55);
+}
+a {
+    color: black;
+}
 .nav-link {
     display: block;
     padding: .5rem 1rem;
-    background-color: orchid; 
+    /* color: rgb(13, 209, 56); */
+    font-weight: bold;
 }
 
-body {
-    padding: 10px;
+.card {
+    color: black;
+}
+
+#signed_unsigned {
+    padding-left: 89%;
 }
