@@ -71,7 +71,7 @@ def create_listing(request):
     if request.method == "POST":
         user = User.objects.get(username=request.user.username)
         l = Listing(created_by=user, 
-                    category=request.POST["category_chosen"],
+                    category=Category.objects.get(name=request.POST["category_chosen"]),
                     title=request.POST["title"], 
                     description=request.POST["desc"], 
                     # https://stackoverflow.com/questions/12176585/handling-dates-over-request-get 
@@ -94,7 +94,8 @@ def create_listing(request):
 @login_required
 def new_listing_view(request):
     return render(request, "auctions/new_listing.html", {
-        "category_list": Category.objects.all()
+        "category_list": Category.objects.all(),
+        "default": Category.objects.get(name="Others")
     })
 
 @login_required
@@ -137,14 +138,12 @@ def add_remove_watchlist(request):
 
         if int(request.POST["watch"]):
             l.watchers.add(user)
-            l.save()
             return render(request, "auctions/listing_page.html", {
                 "watchlist": True,
                 "listing": l
             })
         else:
             l.watchers.remove(user)
-            l.save()
             return render(request, "auctions/listing_page.html", {
                 "flag": False,
                 "listing": l
