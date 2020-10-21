@@ -112,44 +112,44 @@ def place_bid(request):
                 )
         b.save()
 
-    return render(request, "auctions/place_bid.html", {
+    return render(request, "auctions/listing_page.html", {
         "listing": Listing.objects.get(pk=l.listingID)
     })
 
 @login_required
-def place_bid_view(request, listingID):
-    if request.user.watchlist.get(listingID=listingID) is not None:
-        flag = True
+def listing_view(request, l_id):
+    if request.user.watchlist.filter(pk=l_id).exists():
+        return render(request, "auctions/listing_page.html", {
+            "watchlist": True,
+            "listing": Listing.objects.get(pk=l_id)
+        })
     else:
-        flag = False
-
-    return render(request, "auctions/place_bid.html", {
-        "watch_flag": flag,
-        "listing": Listing.objects.get(pk=listingID)
-    })
+        return render(request, "auctions/listing_page.html", {
+            "watchlist": False,
+            "listing": Listing.objects.get(pk=l_id)
+        })
     
 @login_required
-def add_to_watchlist(request):
+def add_remove_watchlist(request):
     if request.method == "POST":
         user = request.user
         l = Listing.objects.get(pk=request.POST["id"])
-        l.watchers.add(user)
-        return render(request, "auctions/place_bid.html", {
-            "flag": True,
-            "listing": l
-        })
 
-@login_required
-def remove_from_watchlist(request):
-    if request.method == "POST":
-        user = request.user
-        l = Listing.objects.get(pk=request.POST["id"])
-        l.watchers.remove(user)
-        return render(request, "auctions/place_bid.html", {
-            "flag": False,
-            "listing": l
-        })
-
+        if int(request.POST["watch"]):
+            l.watchers.add(user)
+            l.save()
+            return render(request, "auctions/listing_page.html", {
+                "watchlist": True,
+                "listing": l
+            })
+        else:
+            l.watchers.remove(user)
+            l.save()
+            return render(request, "auctions/listing_page.html", {
+                "flag": False,
+                "listing": l
+            })
+        
 @login_required
 def watchlist_view(request):
     user = request.user
