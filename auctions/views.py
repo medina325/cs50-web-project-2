@@ -70,7 +70,7 @@ def register(request):
 @login_required
 def create_listing(request):
     if request.method == "POST":
-        user = User.objects.get(username=request.user.username)
+        user = request.user
         l = Listing(created_by=user, 
                     category=Category.objects.get(name=request.POST["category_chosen"]),
                     title=request.POST["title"], 
@@ -95,6 +95,7 @@ def create_listing(request):
 @login_required
 def new_listing_view(request):
     return render(request, "auctions/new_listing.html", {
+        "Header": "Create a new listing",
         "category_list": Category.objects.all()
     })
 
@@ -114,13 +115,7 @@ def place_bid(request):
                 )
         b.save()
 
-    listings_on_this_category = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
-    return render(request, "auctions/listing_page.html", {
-        "watchlist": user.watchlist.filter(pk=l_id).exists(),
-        "listing": l,
-        "listings_on_this_category": listings_on_this_category,
-        "same_category_flag": listings_on_this_category.exists()
-    })
+    return HttpResponseRedirect(reverse("listingpage", args=(l.listingID,)))
 
 @login_required
 def listing_view(request, l_id):
@@ -140,19 +135,13 @@ def add_remove_watchlist(request):
         user = request.user
         l_id = request.POST["id"]
         l = Listing.objects.get(pk=l_id)
-        listings_on_this_category = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
-
+        
         if int(request.POST["watch"]):
             l.watchers.add(user)
         else:
             l.watchers.remove(user)
             
-        return render(request, "auctions/listing_page.html", {
-                "watchlist": int(request.POST["watch"]),
-                "listing": l,
-                "listings_on_this_category": listings_on_this_category,
-                "same_category_flag": listings_on_this_category.exists()
-            })
+        return HttpResponseRedirect(reverse("listingpage", args=(l.listingID,)))
         
 @login_required
 def watchlist_view(request):
@@ -172,4 +161,8 @@ def category_listings_view(request, category_name):
 
 @login_required
 def place_comment(request):
+    pass
+
+@login_required
+def act_deact_listing(request):
     pass
