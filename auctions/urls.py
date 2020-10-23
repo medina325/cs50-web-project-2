@@ -13,5 +13,6 @@ urlpatterns = [
     path("listingPage/<int:l_id>", views.listing_view, name="listingpage"),
     path("addRemoveWatchlist", views.add_remove_watchlist, name="add_remove_watchlist"),
     path("watchList", views.watchlist_view, name="watchlist"),
-    path("<slug:category_name>", views.category_listings_view, name="categorylistings"),
+    path("<str:category_name>", views.category_listings_view, name="categorylistings"),
+    path("placeComment", views.place_comment, name="placecomment"),
 ]

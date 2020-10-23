@@ -13,7 +13,7 @@
         <div class="form-group row">
             <label for="description" class="col-sm-1 col-form-label">Description:</label>
             <div class="col-sm-5">
-                <textarea class="form-control" id="description" name="desc" rows="5" required>colocar conteudo do db aqui para futura edicao</textarea>
+                <textarea class="form-control" id="description" name="desc" rows="5" required></textarea>
                 <small class="form-text text-muted" id="descTip">Describe your listing the best way possible ;)</small>
             </div>
         </div>
@@ -35,7 +35,7 @@
                 <div class="col-sm-10">
                     <div class="form-check">
                         {% for category in category_list %}
-                            <input class="form-check-input" type="radio" name="category_chosen" id="category" value="{{ default }}">
+                            <input class="form-check-input" type="text" name="category_chosen" id="category" value="{{ category.name }}">
                             <label class="form-check-label" for="category">{{ category.name }}</label><br>
                         {% endfor %}
                         <small class="form-text text-muted">All * are optional fields</small>

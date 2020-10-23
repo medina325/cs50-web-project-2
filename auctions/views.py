@@ -10,6 +10,7 @@ from django.db import models
 
 def index(request):
     return render(request, "auctions/index.html", {
+        "Header": "Active Listings",
         "listing_list": Listing.objects.all() 
     })
 
@@ -94,8 +95,7 @@ def create_listing(request):
 @login_required
 def new_listing_view(request):
     return render(request, "auctions/new_listing.html", {
-        "category_list": Category.objects.all(),
-        "default": Category.objects.get(name="Others")
+        "category_list": Category.objects.all()
     })
 
 @login_required
@@ -103,7 +103,8 @@ def place_bid(request):
     if request.method == "POST":
         user = request.user
         new_bid = request.POST["new_bid"]
-        l = Listing.objects.get(pk=request.POST["id"])
+        l_id = pk=request.POST["id"]
+        l = Listing.objects.get(l_id)
         l.current_bid = new_bid
         l.save()
         
@@ -113,21 +114,27 @@ def place_bid(request):
                 )
         b.save()
 
+    same_category_l = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
     return render(request, "auctions/listing_page.html", {
-        "listing": Listing.objects.get(pk=l.listingID)
+        "listing": l,
+        "listings_on_this_category": same_category_l
     })
 
 @login_required
 def listing_view(request, l_id):
+    l = Listing.objects.get(pk=l_id)
+    same_category_l = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
     if request.user.watchlist.filter(pk=l_id).exists():
         return render(request, "auctions/listing_page.html", {
             "watchlist": True,
-            "listing": Listing.objects.get(pk=l_id)
+            "listing": l,
+            "listings_on_this_category": same_category_l
         })
     else:
         return render(request, "auctions/listing_page.html", {
             "watchlist": False,
-            "listing": Listing.objects.get(pk=l_id)
+            "listing": l,
+            "listings_on_this_category": same_category_l
         })
     
 @login_required
@@ -164,3 +171,7 @@ def category_listings_view(request, category_name):
         "Header": c.name + "'s Listings",
         "listing_list": c.listings_on_this_category.all()
     })
+
+@login_required
+def place_comment(request,):
+    pass
