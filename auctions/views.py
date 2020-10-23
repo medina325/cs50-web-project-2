@@ -104,7 +104,7 @@ def place_bid(request):
         user = request.user
         new_bid = request.POST["new_bid"]
         l_id = pk=request.POST["id"]
-        l = Listing.objects.get(l_id)
+        l = Listing.objects.get(pk=l_id)
         l.current_bid = new_bid
         l.save()
         
@@ -114,46 +114,44 @@ def place_bid(request):
                 )
         b.save()
 
-    same_category_l = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
+    listings_on_this_category = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
     return render(request, "auctions/listing_page.html", {
+        "watchlist": user.watchlist.filter(pk=l_id).exists(),
         "listing": l,
-        "listings_on_this_category": same_category_l
+        "listings_on_this_category": listings_on_this_category,
+        "same_category_flag": listings_on_this_category.exists()
     })
 
 @login_required
 def listing_view(request, l_id):
     l = Listing.objects.get(pk=l_id)
-    same_category_l = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
-    if request.user.watchlist.filter(pk=l_id).exists():
-        return render(request, "auctions/listing_page.html", {
-            "watchlist": True,
-            "listing": l,
-            "listings_on_this_category": same_category_l
-        })
-    else:
-        return render(request, "auctions/listing_page.html", {
-            "watchlist": False,
-            "listing": l,
-            "listings_on_this_category": same_category_l
-        })
+    listings_on_this_category = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
+    
+    return render(request, "auctions/listing_page.html", {
+        "watchlist": request.user.watchlist.filter(pk=l_id).exists(),
+        "listing": l,
+        "listings_on_this_category": listings_on_this_category,
+        "same_category_flag": listings_on_this_category.exists()
+    })
     
 @login_required
 def add_remove_watchlist(request):
     if request.method == "POST":
         user = request.user
-        l = Listing.objects.get(pk=request.POST["id"])
+        l_id = request.POST["id"]
+        l = Listing.objects.get(pk=l_id)
+        listings_on_this_category = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
 
         if int(request.POST["watch"]):
             l.watchers.add(user)
-            return render(request, "auctions/listing_page.html", {
-                "watchlist": True,
-                "listing": l
-            })
         else:
             l.watchers.remove(user)
-            return render(request, "auctions/listing_page.html", {
-                "flag": False,
-                "listing": l
+            
+        return render(request, "auctions/listing_page.html", {
+                "watchlist": int(request.POST["watch"]),
+                "listing": l,
+                "listings_on_this_category": listings_on_this_category,
+                "same_category_flag": listings_on_this_category.exists()
             })
         
 @login_required
@@ -173,5 +171,5 @@ def category_listings_view(request, category_name):
     })
 
 @login_required
-def place_comment(request,):
+def place_comment(request):
     pass
