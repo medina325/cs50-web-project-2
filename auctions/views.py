@@ -5,6 +5,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
+import re
+
 from .models import *
 from django.db import models
 
@@ -166,3 +168,19 @@ def place_comment(request):
 @login_required
 def act_deact_listing(request):
     pass
+
+def search(request):
+    if request.method == "POST":
+        searchQuery = request.POST["search"]
+        
+        listing_list = []
+        for l in Listing.objects.all():
+            if re.match(searchQuery, l.title) is not None:
+                listing_list.append(Listing.objects.get(pk=l.listingID))
+               
+            
+
+        return render(request, "auctions/index.html", {
+            "Header": "Results Found",
+            "listing_list": listing_list
+        })
