@@ -122,6 +122,8 @@ def place_bid(request):
 @login_required
 def listing_view(request, l_id):
     l = Listing.objects.get(pk=l_id)
+
+    # Get all listings on this category except for the listing that is being shown
     listings_on_this_category = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
     
     return render(request, "auctions/listing_page.html", {
@@ -134,7 +136,8 @@ def listing_view(request, l_id):
 @login_required
 def act_deact_listing(request):
     if request.method == "POST":
-        listing = Listing.objects.get(pk=request.POST["id"])
+        l_id = request.POST["id"]
+        listing = Listing.objects.get(pk=l_id)
 
         higher_bid_price = 0
         for bid in listing.bidsMadeOnMe.all():
@@ -145,6 +148,10 @@ def act_deact_listing(request):
         if higher_bid.user != listing.created_by:
             listing.winner = higher_bid.user
             listing.active = False
+
+            # if listing is on the winner's watchlist then it's gonna get removed from it
+            if (watchlist:=listing.winner.watchlist).filter(pk=l_id).exists():
+                watchlist.remove(listing)
             listing.save()
         else:
             pass # Have to show an error message - maybe an error page?
@@ -174,7 +181,7 @@ def watchlist_view(request):
 
 @login_required
 def won_listings_view(request):
-    won_listings = request.user.winner.all()
+    won_listings = request.user.won_listings.all()
     return render(request, "auctions/index.html", {
         "Header": "Won Listings",
         "listing_list": won_listings

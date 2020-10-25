@@ -17,7 +17,7 @@ class Listing(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="myListing", null=True)
     watchers = models.ManyToManyField(User, blank=True, related_name="watchlist")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listings_on_this_category", null=True, blank=True)
-    winner = models.ForeignKey(User, blank=True, null=True, related_name="winner", on_delete=models.SET_NULL)
+    winner = models.ForeignKey(User, blank=True, null=True, related_name="won_listings", on_delete=models.SET_NULL)
 
     title = models.CharField(max_length=30)
     description = models.TextField()
