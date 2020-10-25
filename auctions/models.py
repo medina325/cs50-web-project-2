@@ -17,7 +17,7 @@ class Listing(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="myListing", null=True)
     watchers = models.ManyToManyField(User, blank=True, related_name="watchlist")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listings_on_this_category", null=True, blank=True)
-    winner = models.OneToOneField(User, blank=True, null=True, related_name="winner", on_delete=models.SET_NULL)
+    winner = models.ForeignKey(User, blank=True, null=True, related_name="winner", on_delete=models.SET_NULL)
 
     title = models.CharField(max_length=30)
     description = models.TextField()
@@ -25,7 +25,6 @@ class Listing(models.Model):
     img_url = models.URLField(null=True, blank=True)
     active = models.BooleanField(default=True)
     current_bid = models.FloatField(null=True, blank=True, default=None)
-    # current_price = models.OneToOneField(User, blank=True, null=True, related_name="my_bid", on_delete=models.SET_NULL)
 
     def __str__(self):
         return f"{self.title}"

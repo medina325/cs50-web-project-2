@@ -13,7 +13,7 @@ from django.db import models
 def index(request):
     return render(request, "auctions/index.html", {
         "Header": "Active Listings",
-        "listing_list": Listing.objects.all() 
+        "listing_list": Listing.objects.filter(active=True) 
     })
 
 
@@ -130,7 +130,26 @@ def listing_view(request, l_id):
         "listings_on_this_category": listings_on_this_category,
         "same_category_flag": listings_on_this_category.exists()
     })
-    
+
+@login_required
+def act_deact_listing(request):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=request.POST["id"])
+
+        higher_bid_price = 0
+        for bid in listing.bidsMadeOnMe.all():
+            if bid.price > higher_bid_price:
+                higher_bid_price = bid.price
+                higher_bid = bid
+        
+        if higher_bid.user != listing.created_by:
+            listing.winner = higher_bid.user
+            listing.active = False
+            listing.save()
+        else:
+            pass # Have to show an error message - maybe an error page?
+    return HttpResponseRedirect(reverse("listingpage", args=(listing.listingID,)))
+
 @login_required
 def add_remove_watchlist(request):
     if request.method == "POST":
@@ -154,6 +173,14 @@ def watchlist_view(request):
     })
 
 @login_required
+def won_listings_view(request):
+    won_listings = request.user.winner.all()
+    return render(request, "auctions/index.html", {
+        "Header": "Won Listings",
+        "listing_list": won_listings
+    })
+
+@login_required
 def category_listings_view(request, category_name):
     c = Category.objects.get(name=category_name)
     return render(request, "auctions/index.html", {
@@ -165,10 +192,6 @@ def category_listings_view(request, category_name):
 def place_comment(request):
     pass
 
-@login_required
-def act_deact_listing(request):
-    pass
-
 def search(request):
     if request.method == "POST":
         searchQuery = request.POST["search"]
@@ -177,9 +200,7 @@ def search(request):
         for l in Listing.objects.all():
             if re.match(searchQuery, l.title) is not None:
                 listing_list.append(Listing.objects.get(pk=l.listingID))
-               
-            
-
+        
         return render(request, "auctions/index.html", {
             "Header": "Results Found",
             "listing_list": listing_list
