@@ -7,7 +7,7 @@
             {% for l in listing_list %}
                 <div class="col-sm-2">
                     <div class="card">
-                        <div class="card text-center">
+                        <div class="card text-center bg-secondary">
                             <div class="card-header">
                                 <strong><a href="{% url 'listingpage' l.listingID %}">{{ l.title }}</a></strong>
                             </div>
@@ -18,7 +18,7 @@
                             </div>
                         {% endif %}
                         <div style="font-size: 14px;">
-                            <ul class="list-group list-group-flush" >
+                            <ul class="list-group list-group-flush">
                                 <li class="list-group-item">{{ l.description }}</li>
                                 {% if l.current_bid is None %}
                                     <li class="list-group-item">Current bid: <strong>$ 0.00</strong></li>
@@ -26,12 +26,14 @@
                                     <li class="list-group-item">Current bid: <strong>$ {{ l.current_bid }}</strong></li>
                                 {% endif %}
                             </ul>
-                            <div class="card-footer text-muted text-center">
+                            <div class="card-footer text-center text-white bg-secondary">
                                 Created on {{ l.creation_date}}
                             </div>
                         </div>
                     </div>              
                 </div>
+            {% empty %}
+                <h2>No listings here!</h2>
             {% endfor %}  
         </div>
 {% endblock %}

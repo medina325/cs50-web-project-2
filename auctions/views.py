@@ -91,7 +91,7 @@ def create_listing(request):
 
     return render(request, "auctions/index.html", {
         "Header": "Active Listings",
-        "listing_list": Listing.objects.all()
+        "listing_list": Listing.objects.filter(active=True)
     })
 
 @login_required
@@ -130,7 +130,8 @@ def listing_view(request, l_id):
         "watchlist": request.user.watchlist.filter(pk=l_id).exists(),
         "listing": l,
         "listings_on_this_category": listings_on_this_category,
-        "same_category_flag": listings_on_this_category.exists()
+        "same_category_flag": listings_on_this_category.exists(),
+        "commentary_list": l.commentsMadeOnMe.all()
     })
 
 @login_required
@@ -188,6 +189,18 @@ def won_listings_view(request):
     })
 
 @login_required
+def place_comment(request):
+    if request.method == "POST":
+        l = Listing.objects.get(pk=request.POST["id"])
+
+        comment = Comment(content=request.POST["comment"],
+                          listing=l,
+                          user = request.user)
+        comment.save()
+
+        return HttpResponseRedirect(reverse("listingpage", args=(l.listingID,)))
+
+@login_required
 def category_listings_view(request, category_name):
     c = Category.objects.get(name=category_name)
     return render(request, "auctions/index.html", {
@@ -195,20 +208,30 @@ def category_listings_view(request, category_name):
         "listing_list": c.listings_on_this_category.all()
     })
 
-@login_required
-def place_comment(request):
-    pass
-
 def search(request):
     if request.method == "POST":
         searchQuery = request.POST["search"]
         
         listing_list = []
-        for l in Listing.objects.all():
-            if re.match(searchQuery, l.title) is not None:
-                listing_list.append(Listing.objects.get(pk=l.listingID))
+        # Search results among the active listings
+        if (active_listings:=Listing.objects.filter(active=True)).exists():
+            for l in active_listings:
+                if re.match(searchQuery, l.title) is not None:
+                    listing_list.append(Listing.objects.get(pk=l.listingID))
+        else:
+            return render(request, "auctions/index.html", {
+                "Header": "There are no more active listings :(",
+                "listing_list": listing_list
+            })
         
-        return render(request, "auctions/index.html", {
-            "Header": "Results Found",
-            "listing_list": listing_list
-        })
+        # If the listing list is not empty then matches were found
+        if len(listing_list) != 0:
+            return render(request, "auctions/index.html", {
+                        "Header": "Results Found",
+                        "listing_list": listing_list
+                    })
+        else:
+            return render(request, "auctions/index.html",{
+                "Header": "No results found",
+                "listing_list": listing_list
+            })

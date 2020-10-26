@@ -26,8 +26,14 @@
                 background-size: cover;
             }
 
+            .reg_log_footer_link {
+                color: rgba(0, 255, 55, 0.808);
+            }
+
             a:hover {
                 color: rgb(0, 255, 55);
+                font-weight: bold;
+                text-decoration: none;
             }
             a {
                 color: black;
@@ -43,13 +49,8 @@
                 color: black;
             }
 
-            #signed_unsigned {
-                padding-left: 89%;
-            }
-
             .form-group {
-                width: 50%;
-                margin-left: 5%;
+                width: 60%;
             }
         </style>
     </head>
@@ -115,7 +116,7 @@
             </div>
         </nav>
 
-        <div id="signed_unsigned">
+        <div>
             {% if user.is_authenticated %}
                 Signed in as <strong>{{ user.username }}</strong>.
             {% else %}
