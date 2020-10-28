@@ -14,7 +14,7 @@ class Category(models.Model):
 
 class Listing(models.Model):
     listingID = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="listID")
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="myListing", null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="my_listings", null=True)
     watchers = models.ManyToManyField(User, blank=True, related_name="watchlist")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listings_on_this_category", null=True, blank=True)
     winner = models.ForeignKey(User, blank=True, null=True, related_name="won_listings", on_delete=models.SET_NULL)
@@ -30,8 +30,8 @@ class Listing(models.Model):
         return f"{self.title}"
 
 class Bid(models.Model):
-    listing = models.ForeignKey(Listing, on_delete=models.SET_NULL, related_name="bidsMadeOnMe", null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="myBids", null=True)
+    listing = models.ForeignKey(Listing, on_delete=models.SET_NULL, related_name="bids_made_on_me", null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="my_bids", null=True)
 
     price = models.FloatField()
     creation_date = models.DateField(auto_now=True, null=True)
@@ -42,5 +42,5 @@ class Bid(models.Model):
 class Comment(models.Model):
     creation_date = models.DateField(auto_now=True, null=True)
     content = models.TextField()
-    listing = models.ForeignKey(Listing, on_delete=models.SET_NULL, related_name="commentsMadeOnMe", null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="myComments", null=True)
+    listing = models.ForeignKey(Listing, on_delete=models.SET_NULL, related_name="comments_made_on_me", null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="my_comments", null=True)

@@ -12,10 +12,12 @@ urlpatterns = [
     path("newListing", views.new_listing_view, name="newlisting"),
     path("placingBid", views.place_bid, name="placingbid"),
     path("listingPage/<int:l_id>", views.listing_view, name="listingpage"),
-    path("actDeactListing", views.act_deact_listing, name="actdeactlisting"),
+    path("actListing", views.activate_listing, name="actlisting"),
+    path("deactListing", views.deactivate_listing, name="deactlisting"),
     path("addRemoveWatchlist", views.add_remove_watchlist, name="add_remove_watchlist"),
     path("watchList", views.watchlist_view, name="watchlist"),
     path("wonListings", views.won_listings_view, name="wonlistings"),
     path("placeComment", views.place_comment, name="placecomment"),
+    path("myListings", views.my_listings_view, name="mylistings"),
     path("<str:category_name>", views.category_listings_view, name="categorylistings"),
 ]

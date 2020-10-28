@@ -119,43 +119,60 @@ def place_bid(request):
 
     return HttpResponseRedirect(reverse("listingpage", args=(l.listingID,)))
 
-@login_required
 def listing_view(request, l_id):
     l = Listing.objects.get(pk=l_id)
 
     # Get all listings on this category except for the listing that is being shown
-    listings_on_this_category = Category.objects.get(name=l.category.name).listings_on_this_category.exclude(pk=l_id)
+    listings_on_this_category = l.category.listings_on_this_category.exclude(pk=l_id)
     
-    return render(request, "auctions/listing_page.html", {
-        "watchlist": request.user.watchlist.filter(pk=l_id).exists(),
-        "listing": l,
-        "listings_on_this_category": listings_on_this_category,
-        "same_category_flag": listings_on_this_category.exists(),
-        "commentary_list": l.commentsMadeOnMe.all()
-    })
+    if request.user.is_authenticated:
+        return render(request, "auctions/listing_page.html", {
+            "listing": l,
+            "watchlist": request.user.watchlist.filter(pk=l_id).exists(),
+            "listings_on_this_category": listings_on_this_category,
+            "same_category_flag": listings_on_this_category.exists(),
+            "commentary_list": l.comments_made_on_me.all()
+        })
+    else:
+        return render(request, "auctions/listing_page.html", {
+            "listing": l,
+            "listings_on_this_category": listings_on_this_category,
+            "same_category_flag": listings_on_this_category.exists(),
+            "commentary_list": l.comments_made_on_me.all()
+        })       
 
 @login_required
-def act_deact_listing(request):
+def activate_listing(request):
+    if request.method == "POST":
+        l_id = request.POST["id"]
+        listing = Listing.objects.get(pk=l_id)
+
+        listing.active = True
+        listing.save()
+        return HttpResponseRedirect(reverse("listingpage", args=(listing.listingID,)))
+
+@login_required
+def deactivate_listing(request):
     if request.method == "POST":
         l_id = request.POST["id"]
         listing = Listing.objects.get(pk=l_id)
 
         higher_bid_price = 0
-        for bid in listing.bidsMadeOnMe.all():
+        for bid in listing.bids_made_on_me.all():
             if bid.price > higher_bid_price:
                 higher_bid_price = bid.price
                 higher_bid = bid
         
+        # Note that if no one placed a bid, the listing is still gonna be closed (which is going to be verified in the listing_page template)
         if higher_bid.user != listing.created_by:
             listing.winner = higher_bid.user
-            listing.active = False
-
             # if listing is on the winner's watchlist then it's gonna get removed from it
             if (watchlist:=listing.winner.watchlist).filter(pk=l_id).exists():
                 watchlist.remove(listing)
-            listing.save()
-        else:
-            pass # Have to show an error message - maybe an error page?
+        
+        listing.active = False
+        listing.save()
+        
     return HttpResponseRedirect(reverse("listingpage", args=(listing.listingID,)))
 
 @login_required
@@ -182,10 +199,9 @@ def watchlist_view(request):
 
 @login_required
 def won_listings_view(request):
-    won_listings = request.user.won_listings.all()
     return render(request, "auctions/index.html", {
         "Header": "Won Listings",
-        "listing_list": won_listings
+        "listing_list": request.user.won_listings.all()
     })
 
 @login_required
@@ -201,6 +217,12 @@ def place_comment(request):
         return HttpResponseRedirect(reverse("listingpage", args=(l.listingID,)))
 
 @login_required
+def my_listings_view(request):
+    return render(request, "auctions/index.html", {
+        "Header": "My Listings",
+        "listing_list": request.user.my_listings.all()
+    })
+
 def category_listings_view(request, category_name):
     c = Category.objects.get(name=category_name)
     return render(request, "auctions/index.html", {
