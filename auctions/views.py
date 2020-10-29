@@ -227,7 +227,7 @@ def category_listings_view(request, category_name):
     c = Category.objects.get(name=category_name)
     return render(request, "auctions/index.html", {
         "Header": c.name + "'s Listings",
-        "listing_list": c.listings_on_this_category.all()
+        "listing_list": c.listings_on_this_category.filter(active=True)
     })
 
 def search(request):
