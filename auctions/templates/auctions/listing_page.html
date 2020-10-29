@@ -1,0 +1,179 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="card mb-3" style="max-width: 100%; opacity: .95;">
+        <div class="row no-gutters">
+            {% if listing.img_url != null %}
+                <div class="col-md-4">
+                    <img class="card-img" src={{ listing.img_url }} alt="{{ listing.title }}">
+                </div>
+            {% endif %}
+            
+            <div class="col-md-8">
+                <div class="card text-center bg-secondary">
+                    <div class="card-header" style="font-size: 20px;">
+                        <strong><a href="#">{{ listing.title }}</a></strong>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% if user.is_authenticated and user != listing.created_by %}
+                        {% if listing.active %}
+                            <li class="list-group-item">
+                                <form action="{% url 'add_remove_watchlist' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" class="form-control" name="id" value="{{ listing.listingID }}">
+                                    {% if watchlist %}
+                                        <input type="hidden" class="form-control" name="watch" value="0">
+                                        <div>
+                                            <button type="submit" class="btn btn-dark btn-block">Remove from my watchlist</button>
+                                        </div>
+                                    {% else %}
+                                        <input type="hidden" class="form-control" name="watch" value="1">
+                                        <div> 
+                                            <button type="submit" class="btn btn-dark btn-block">Add to my watchlist</button>
+                                        </div>                                    
+                                    {% endif %}
+                                </form>
+                            </li>
+                        {% else %}
+                            <li class="list-group-item">
+                                {% if user == listing.winner %}
+                                    <div>
+                                        <button type="text" class="btn btn-success btn-block" disabled>Congratulations! You won!</button>
+                                    </div>
+                                {% else %}
+                                <div>
+                                    <button type="text" class="btn btn-dark btn-block" disabled>Listing is closed. Too late :/</button>
+                                </div>
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                    {% elif user.is_authenticated and user == listing.created_by %}
+                        <li class="list-group-item">
+                            {% if listing.active %}
+                                <form action="{% url 'deactlisting' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" class="form-control" name="id" value="{{ listing.listingID }}">
+                                    <div>
+                                        <button type="submit" class="btn btn-dark btn-block">Close listing</button>
+                                    </div>
+                                </form>
+                            {% else %}
+                                {% if listing.winner == None %}
+                                    <form action="{% url 'actlisting' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" class="form-control" name="id" value="{{ listing.listingID }}"> 
+                                        <div>
+                                            <button type="submit" class="btn btn-warning btn-block">There is no winner :(<br> Click here if you want to reactivate this listing</button>
+                                        </div>                                     
+                                    </form>                                
+                                {% else %}
+                                    <div> 
+                                        <button type="text" class="btn btn-info btn-block" disabled>Winner is {{ listing.winner }}!</button>
+                                    </div> 
+                                {% endif %}                          
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                    <li class="list-group-item">Description: {{ listing.description }}</li>
+                    <li class="list-group-item">Category: {{ listing.category }}</li>
+                   
+                    {% if listing.current_bid is None %}
+                        <li class="list-group-item">Current bid: <strong>$ 0.00</strong></li>
+                    {% else %}
+                        <li class="list-group-item">Current bid: <strong>$ {{ listing.current_bid }}</strong></li>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user != listing.created_by and listing.active %}
+                        <li class="list-group-item">                    
+                            <form action="{% url 'placingbid' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" class="form-control" name="id" value="{{ listing.listingID }}">
+                            
+                                <div class="input-group mb-1">
+                                    <input name="new_bid" type="number" class="form-control" aria-label="Place your bid here ($)" min="{{listing.current_bid}}" step="0.01" value="{{listing.current_bid}}" aria-describedby="button-addon2">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-success" type="submit" id="button-addon2">Place Bid</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+                <div class="card-footer bg-secondary text-white text-center">
+                    Listed by {{ listing.created_by }}
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><small class="text-muted">Created on {{ listing.creation_date }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- --------------------------------------------------------------------------------------------------------------- -->
+<!-- Comments and recommendations of other listings that belong to the same category -->
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <form action="{% url 'placecomment' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" class="form-control" name="id" value="{{ listing.listingID }}">
+                    <div class="form-group w-50">
+                        <h5>Comments</h5>
+                        <!-- <label for="commentTextarea">Comments</label> -->
+                        {% if user.is_authenticated %}
+                            <br>
+                            <textarea class="form-control" name="comment" id="commentTextarea" rows="3" placeholder="Add your commentary here" style="resize: none;"></textarea>
+                            <button type="submit" class="btn btn-success btn-block">Place commentary</button>
+                        {% endif %}
+                    </div>
+                </form>
+                <br>
+                {% for comment in commentary_list %}
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ comment.user}} said:</h5>
+                                    <p class="card-text">{{comment.content}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><br>
+                {% empty %}
+                    <h6>No comments made</h6>
+                {% endfor %}
+            </div>
+            <div class="col-sm-2">
+                {% if same_category_flag %}
+                    <h5 style="text-align: center;">Other listings in this category</h5>
+                    {% for l in listings_on_this_category %}
+                        <div class="card" style="height: 300px; margin-bottom: 50%;">
+                            <div class="card text-center">
+                                <div class="card-header">
+                                    <strong><a href="{% url 'listingpage' l.listingID %}">{{ l.title }}</a></strong>
+                                </div>
+                            </div>
+                            {% if l.img_url != null %}
+                                <div class="card-body">
+                                    <img class="card-img-top" src={{ l.img_url }} alt="{{ l.title }}">
+                                </div>
+                            {% endif %}
+                            <hr>
+                            <div style="font-size: 14px;">
+                                <ul class="list-group list-group-flush" >
+                                    {% if l.current_bid is None %}
+                                        <li class="list-group-item">Current bid: <strong>$ 0.00</strong></li>
+                                    {% else %}
+                                        <li class="list-group-item">Current bid: <strong>$ {{ l.current_bid }}</strong></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endfor %}    
+                {% else %}
+                    <h5 style="text-align: center;">No other listings in this category</h5>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
